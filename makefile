@@ -1,6 +1,6 @@
 OK_COLOR = \033[0;32m
 
-OBJ = entity.o
+OBJ = entity.o entity_player.o
 
 BUILD0 = @g++ -o $@ -c $< -w
 BUILD1 = @printf "%s compiled\n" $@

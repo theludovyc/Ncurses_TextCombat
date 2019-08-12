@@ -2,8 +2,8 @@
 
 using namespace std;
 
-Entity::Entity(){
-}
+//Entity::Entity(){
+//}
 
 Entity::Entity(std::string s){
 	this->name=s;

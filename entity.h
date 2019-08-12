@@ -4,10 +4,10 @@
 #include <string>
 
 class Entity{
-	std::string name;
+	protected:
+		std::string name;
 
 	public:
-		Entity();
 		Entity(std::string s);
 
 		std::string getName();

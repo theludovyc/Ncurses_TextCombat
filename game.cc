@@ -1,17 +1,17 @@
-#include "entity.h"
+#include "entity_player.h"
 
 using namespace std;
 
-Entity* entity;
+Player* player;
 
 void printS(string s){
 	printw(s.c_str());
 }
 
 void onInit(){
-	entity = new Entity("Joel"); 
+	player = new Player(); 
 
-	printS(entity->getName()+"bubule");
+	printS(player->getName());
 
 	//refresh();
 }
@@ -25,5 +25,5 @@ void onUpdate(){
 }
 
 void onExit(){
-	delete(entity);
+	delete(player);
 }
