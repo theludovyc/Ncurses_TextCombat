@@ -9,12 +9,32 @@ Monster* monster;
 
 unsigned int lvl = 1;
 
+string string_buffer[5];
+
+unsigned int state = 1;
+
 void printS(string s){
 	printw(s.c_str());
 }
 
 void addLine(string s){
+	for(int i=0; i<4; i++){
+		string_buffer[i]=string_buffer[i+1];
+	}
+
+	string_buffer[4]=s;
+}
+
+void printLine(string s){
 	printw((s+"\n").c_str());
+}
+
+void printBuffer(){
+	move(1,1);
+
+	for(string s:string_buffer){
+		printLine(s);
+	}
 }
 
 void openDoor(){
@@ -37,13 +57,38 @@ void onInit(){
 	monster = new Monster();
 
 	openDoor();
-	popMonster();
 
-	//refresh();
+	printBuffer();
+}
+
+void todo(){
+	switch(state){
+		case 0:
+			openDoor();
+			state=1;
+			break;
+
+		case 1:
+			popMonster();
+			state=2;
+			break;
+
+		default:
+			break;
+	}
+
+	clear();
+
+	printBuffer();
+
+	refresh();
 }
 
 void onKey(int key){
-
+	switch(key){
+		case ' ':
+			todo();
+	}
 }
 
 void onUpdate(){
