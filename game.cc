@@ -1,4 +1,4 @@
-#include "entity_player.h"
+#include "game.h"
 
 using namespace std;
 

@@ -1,7 +1,7 @@
 #include <ncurses.h>
 #include <string>
 
-#include "game.cc"
+#include "game.h"
 
 unsigned char again=1;
 
