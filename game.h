@@ -2,7 +2,6 @@
 #define _game
 
 #include <ncurses.h>
-#include "entity_player.h"
 
 void onInit();
 
