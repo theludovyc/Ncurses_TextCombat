@@ -7,7 +7,12 @@ class Entity{
 	protected:
 		std::string name;
 
+		int pv;
+		int pvMax;
+
 	public:
+		Entity(){};
+
 		Entity(std::string s);
 
 		std::string getName();

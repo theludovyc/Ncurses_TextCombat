@@ -5,7 +5,9 @@
 
 class Monster : public Entity{
 	public:
-		Monster();
+		Monster(){};
+
+		void init(int i);
 };
 
 #endif

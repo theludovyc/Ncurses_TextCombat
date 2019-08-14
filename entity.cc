@@ -10,5 +10,5 @@ Entity::Entity(std::string s){
 }
 
 string Entity::getName(){
-	return this->name;
+	return this->name+"("+to_string(pv)+")";
 }
