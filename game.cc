@@ -2,6 +2,11 @@
 #include "entity_player.h"
 #include "entity_monster.h"
 
+#include <array>
+#include <string>
+
+#define string_buffer_size 5
+
 enum states{
 	OPEN_DOOR,
 	POP_MONSTER,
@@ -15,7 +20,7 @@ Monster* monster;
 
 unsigned int lvl = 1;
 
-string string_buffer[5];
+array<string, string_buffer_size> string_buffer;
 
 unsigned int state = OPEN_DOOR;
 
@@ -24,15 +29,17 @@ void printS(string s){
 }
 
 void addLine(string s){
-	for(int i=0; i<4; i++){
+	int i=0;
+
+	for(; i<string_buffer.size()-1; i++){
 		string_buffer[i]=string_buffer[i+1];
 	}
 
-	string_buffer[4]=s;
+	string_buffer[i]=s;
 }
 
 void addText(string s){
-	string_buffer[4]+=s;
+	string_buffer[string_buffer.size()-1]+=s;
 }
 
 void printLine(string s){
