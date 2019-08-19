@@ -12,3 +12,7 @@ Entity::Entity(std::string s){
 string Entity::getName(){
 	return this->name+"("+to_string(pv)+")";
 }
+
+unsigned int Entity::getIni(){
+	return this->ini;
+}

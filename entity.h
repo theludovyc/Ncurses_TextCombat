@@ -7,8 +7,11 @@ class Entity{
 	protected:
 		std::string name;
 
-		int pv;
-		int pvMax;
+		unsigned int pv;
+		unsigned int pvMax;
+
+		//initiative
+		unsigned int ini;
 
 	public:
 		Entity(){};
@@ -16,6 +19,8 @@ class Entity{
 		Entity(std::string s);
 
 		std::string getName();
+
+		unsigned int getIni();
 };
 
 #endif

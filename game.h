@@ -3,6 +3,8 @@
 
 #include <ncurses.h>
 
+#include "helper.h"
+
 void onInit();
 
 void onKey(int key);

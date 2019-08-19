@@ -4,7 +4,8 @@
 
 enum states{
 	OPEN_DOOR,
-	POP_MONSTER
+	POP_MONSTER,
+	CHECK_INI
 };
 
 using namespace std;
@@ -30,6 +31,10 @@ void addLine(string s){
 	string_buffer[4]=s;
 }
 
+void addText(string s){
+	string_buffer[4]+=s;
+}
+
 void printLine(string s){
 	printw((s+"\n").c_str());
 }
@@ -50,7 +55,17 @@ void openDoor(){
 void popMonster(){
 	monster->init(lvl);
 
-	addLine("Un "+monster->getName()+" apparait !");
+	addLine("Un "+monster->getName()+" apparait...");
+}
+
+void checkIni(){
+	if (player->getIni() > monster->getIni() ){
+		addLine(player->getName());
+	}else{
+		addLine(monster->getName());
+	}
+
+	addText(" attaque en premier !");
 }
 
 void todo(){
@@ -62,10 +77,16 @@ void todo(){
 
 		case POP_MONSTER:
 			popMonster();
-			state=2;
+			state=CHECK_INI;
+			break;
+
+		case CHECK_INI:
+			checkIni();
+			state++;
 			break;
 
 		default:
+			goto end;
 			break;
 	}
 
@@ -74,9 +95,14 @@ void todo(){
 	printBuffer();
 
 	refresh();
+
+	end:
+	return;
 }
 
 void onInit(){
+	Helper::seed("Bla");
+
 	player = new Player(); 
 
 	monster = new Monster();
