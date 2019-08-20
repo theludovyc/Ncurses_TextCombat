@@ -7,6 +7,9 @@
 
 #define string_buffer_size 5
 
+WINDOW *win_game;
+//WINDOW *win_help;
+
 enum states{
 	OPEN_DOOR,
 	POP_MONSTER,
@@ -43,11 +46,11 @@ void addText(string s){
 }
 
 void printLine(string s){
-	printw((s+"\n").c_str());
+	wprintw(win_game, (s+"\n").c_str());
 }
 
 void printBuffer(){
-	move(1,1);
+	wmove(win_game, 0, 0);
 
 	for(string s:string_buffer){
 		printLine(s);
@@ -97,11 +100,12 @@ void todo(){
 			break;
 	}
 
-	clear();
+	//werase(win_game);
 
 	printBuffer();
 
-	refresh();
+	touchwin(win_game);
+	wrefresh(win_game);
 
 	end:
 	return;
@@ -110,11 +114,15 @@ void todo(){
 void onInit(){
 	Helper::seed("Bla");
 
+	win_game=derwin(stdscr, string_buffer_size, COLS, 0, 0);
+
 	player = new Player(); 
 
 	monster = new Monster();
 
 	todo();
+
+	wcursyncup(win_game);
 }
 
 void onKey(int key){
@@ -125,10 +133,13 @@ void onKey(int key){
 }
 
 void onUpdate(){
-	
+	//doupdate();
 }
 
 void onExit(){
+	delwin(win_game);
+	//delwin(win_help);
+
 	delete(player);
 	delete(monster);
 }
