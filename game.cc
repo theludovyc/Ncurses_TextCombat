@@ -16,7 +16,9 @@ enum states{
 	CHECK_INI,
 	MONSTER_ATTACK,
 	PLAYER_ATTACK,
-	NEW_TURN
+	NEW_TURN,
+	PLAYER_DEATH,
+	MONSTER_DEATH
 };
 
 using namespace std;
@@ -32,6 +34,10 @@ unsigned int state = OPEN_DOOR;
 
 bool player_attack;
 bool monster_attack;
+
+bool player_choice_isActive=false;
+unsigned char player_choice_max;
+unsigned char player_choice=0;
 
 void printS(string s){
 	printw(s.c_str());
@@ -67,11 +73,30 @@ void openDoor(){
 	addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
 }
 
-
 void monsterPop(){
 	monster->init(lvl);
 
 	addLine("Un "+monster->getName()+" apparait...");
+}
+
+void help_print(string s){
+	wprintw(win_help, s.c_str());
+	touchwin(win_help);
+	wrefresh(win_help);
+}
+
+void help_erase(){
+	werase(win_help);
+	touchwin(win_help);
+	wrefresh(win_help);
+}
+
+void playerSetAttack(){
+	help_print("a.Atk z.Atk++ e.Def");
+	player_choice_isActive=true;
+	player_choice=4;
+	player_choice_max=3;
+	state=PLAYER_ATTACK;
 }
 
 void checkIni(){
@@ -80,7 +105,7 @@ void checkIni(){
 
 	if (player->getIni() > monster->getIni() ){
 		addLine(player->getName());
-		state=PLAYER_ATTACK;
+		playerSetAttack();
 	}else{
 		addLine(monster->getName());
 		state=MONSTER_ATTACK;
@@ -95,13 +120,26 @@ void monsterAttack(){
 	addLine(monster->getName());
 
 	if(monster->testAttack()){
-		addText(" attaque.");
+		addText(" attaque, ");
+
+		if(player->testAttack()){
+			addText("mais " + player->getName() + " se défend !");
+		}else{
+			auto dam = monster->getDamage();
+
+			addText("et inflige " + to_string(dam) + " dégat(s)");
+
+			if(player->removeLife(dam)){
+				state=PLAYER_DEATH;
+				return;
+			}
+		}
 	}else{
 		addText(" rate son attaque.");
 	}
 
 	if(!player_attack){
-		state=PLAYER_ATTACK;
+		playerSetAttack();
 		return;
 	}
 	state=NEW_TURN;
@@ -113,7 +151,13 @@ void playerAttack(){
 	addLine(player->getName());
 
 	if(player->testAttack()){
-		addText(" attaque.");
+		auto dam = player->getDamage();
+		addText(" inflige " + to_string(dam) + " dégat(s)");
+
+		if(monster->removeLife(dam)){
+			state=MONSTER_DEATH;
+			return;
+		}
 	}else{
 		addText(" rate son attaque.");
 	}
@@ -146,7 +190,13 @@ void todo(){
 			break;
 
 		case PLAYER_ATTACK:
-			playerAttack();
+			if(player_choice<player_choice_max){
+				help_erase();
+				player_choice_isActive=false;
+				playerAttack();
+				break;
+			}
+			goto end;
 			break;
 
 		case NEW_TURN:
@@ -156,7 +206,6 @@ void todo(){
 
 		default:
 			goto end;
-			break;
 	}
 
 	//werase(win_game);
@@ -187,9 +236,33 @@ void onInit(){
 }
 
 void onKey(int key){
-	switch(key){
-		case ' ':
-			todo();
+	if(player_choice_isActive){
+		switch(key){
+			case 'a':
+				player_choice=0;
+				todo();
+				break;
+			
+			case 'z':
+				player_choice=1;
+				todo();
+				break;
+
+			case 'e':
+				player_choice=2;
+				todo();
+				break;
+
+			case 'r':
+				player_choice=3;
+				todo();
+				break;
+
+			default:
+				break;
+		}
+	}else if(key == ' '){
+		todo();
 	}
 }
 

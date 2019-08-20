@@ -25,3 +25,15 @@ bool Entity::testAttack(){
 	}
 	return false;
 }
+
+unsigned int Entity::getDamage(){
+	return Helper::rand_between(degMin, degMax);
+}
+
+bool Entity::removeLife(unsigned int i){
+	if(i>=pv){
+		return true;
+	}
+	pv-=i;
+	return false;
+}

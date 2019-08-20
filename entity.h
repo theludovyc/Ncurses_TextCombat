@@ -16,6 +16,10 @@ class Entity{
 		//capacite de combat
 		unsigned int cc;
 
+		//degat
+		unsigned int degMin;
+		unsigned int degMax;
+
 	public:
 		Entity(){};
 
@@ -26,6 +30,10 @@ class Entity{
 		unsigned int getIni();
 
 		bool testAttack();
+
+		unsigned int getDamage();
+
+		bool removeLife(unsigned int i);
 };
 
 #endif

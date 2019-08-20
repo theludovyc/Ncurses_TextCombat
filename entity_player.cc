@@ -7,4 +7,7 @@ Player::Player():Entity("Héro"){
 	ini=5;
 
 	cc=50;
+
+	degMax=3;
+	degMin=1;
 }
