@@ -35,9 +35,9 @@ unsigned int state = OPEN_DOOR;
 bool player_attack;
 bool monster_attack;
 
-bool player_choice_isActive=false;
-unsigned char player_choice_max;
-unsigned char player_choice=0;
+bool player_key_isActive=false;
+unsigned char player_key_max;
+unsigned char player_key=0;
 
 void printS(string s){
 	printw(s.c_str());
@@ -93,9 +93,9 @@ void help_erase(){
 
 void playerSetAttack(){
 	help_print("a.Atk z.Atk++ e.Def");
-	player_choice_isActive=true;
-	player_choice=4;
-	player_choice_max=3;
+	player_key_isActive=true;
+	player_key=4;
+	player_key_max=3;
 	state=PLAYER_ATTACK;
 }
 
@@ -150,16 +150,25 @@ void playerAttack(){
 
 	addLine(player->getName());
 
-	if(player->testAttack()){
-		auto dam = player->getDamage();
-		addText(" inflige " + to_string(dam) + " dégat(s)");
+	if(player_key!=2){
+		if(player->testAttack()){
+			auto dam = player->getDamage();
 
-		if(monster->removeLife(dam)){
-			state=MONSTER_DEATH;
-			return;
+			if(player_key==1){
+				dam*=2;
+			}
+
+			addText(" inflige " + to_string(dam) + " dégat(s)");
+
+			if(monster->removeLife(dam)){
+				state=MONSTER_DEATH;
+				return;
+			}
+		}else{
+			addText(" rate son attaque.");
 		}
 	}else{
-		addText(" rate son attaque.");
+		addText(" prépare sa défense.");
 	}
 
 	if(!monster_attack){
@@ -190,9 +199,9 @@ void todo(){
 			break;
 
 		case PLAYER_ATTACK:
-			if(player_choice<player_choice_max){
+			if(player_key<player_key_max){
 				help_erase();
-				player_choice_isActive=false;
+				player_key_isActive=false;
 				playerAttack();
 				break;
 			}
@@ -236,25 +245,25 @@ void onInit(){
 }
 
 void onKey(int key){
-	if(player_choice_isActive){
+	if(player_key_isActive){
 		switch(key){
 			case 'a':
-				player_choice=0;
+				player_key=0;
 				todo();
 				break;
 			
 			case 'z':
-				player_choice=1;
+				player_key=1;
 				todo();
 				break;
 
 			case 'e':
-				player_choice=2;
+				player_key=2;
 				todo();
 				break;
 
 			case 'r':
-				player_choice=3;
+				player_key=3;
 				todo();
 				break;
 
