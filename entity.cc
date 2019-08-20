@@ -1,18 +1,27 @@
 #include "entity.h"
 
+#include "helper.h"
+
 using namespace std;
 
 //Entity::Entity(){
 //}
 
 Entity::Entity(std::string s){
-	this->name=s;
+	name=s;
 }
 
 string Entity::getName(){
-	return this->name+"("+to_string(pv)+")";
+	return name+"("+to_string(pv)+")";
 }
 
 unsigned int Entity::getIni(){
-	return this->ini;
+	return ini;
+}
+
+bool Entity::testAttack(){
+	if(Helper::rand_between(1, 100) <= cc){
+		return true;
+	}
+	return false;
 }

@@ -13,6 +13,9 @@ class Entity{
 		//initiative
 		unsigned int ini;
 
+		//capacite de combat
+		unsigned int cc;
+
 	public:
 		Entity(){};
 
@@ -21,6 +24,8 @@ class Entity{
 		std::string getName();
 
 		unsigned int getIni();
+
+		bool testAttack();
 };
 
 #endif

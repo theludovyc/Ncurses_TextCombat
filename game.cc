@@ -8,12 +8,15 @@
 #define string_buffer_size 5
 
 WINDOW *win_game;
-//WINDOW *win_help;
+WINDOW *win_help;
 
 enum states{
 	OPEN_DOOR,
-	POP_MONSTER,
-	CHECK_INI
+	MONSTER_POP,
+	CHECK_INI,
+	MONSTER_ATTACK,
+	PLAYER_ATTACK,
+	NEW_TURN
 };
 
 using namespace std;
@@ -26,6 +29,9 @@ unsigned int lvl = 1;
 array<string, string_buffer_size> string_buffer;
 
 unsigned int state = OPEN_DOOR;
+
+bool player_attack;
+bool monster_attack;
 
 void printS(string s){
 	printw(s.c_str());
@@ -42,7 +48,7 @@ void addLine(string s){
 }
 
 void addText(string s){
-	string_buffer[string_buffer.size()-1]+=s;
+	string_buffer.back() += s;
 }
 
 void printLine(string s){
@@ -62,37 +68,90 @@ void openDoor(){
 }
 
 
-void popMonster(){
+void monsterPop(){
 	monster->init(lvl);
 
 	addLine("Un "+monster->getName()+" apparait...");
 }
 
 void checkIni(){
+	player_attack=false;
+	monster_attack=false;
+
 	if (player->getIni() > monster->getIni() ){
 		addLine(player->getName());
+		state=PLAYER_ATTACK;
 	}else{
 		addLine(monster->getName());
+		state=MONSTER_ATTACK;
 	}
 
 	addText(" attaque en premier !");
+}
+
+void monsterAttack(){
+	monster_attack=true;
+
+	addLine(monster->getName());
+
+	if(monster->testAttack()){
+		addText(" attaque.");
+	}else{
+		addText(" rate son attaque.");
+	}
+
+	if(!player_attack){
+		state=PLAYER_ATTACK;
+		return;
+	}
+	state=NEW_TURN;
+}
+
+void playerAttack(){
+	player_attack=true;
+
+	addLine(player->getName());
+
+	if(player->testAttack()){
+		addText(" attaque.");
+	}else{
+		addText(" rate son attaque.");
+	}
+
+	if(!monster_attack){
+		state=MONSTER_ATTACK;
+		return;
+	}
+	state=NEW_TURN;
 }
 
 void todo(){
 	switch(state){
 		case OPEN_DOOR:
 			openDoor();
-			state=POP_MONSTER;
+			state=MONSTER_POP;
 			break;
 
-		case POP_MONSTER:
-			popMonster();
+		case MONSTER_POP:
+			monsterPop();
 			state=CHECK_INI;
 			break;
 
 		case CHECK_INI:
 			checkIni();
-			state++;
+			break;
+
+		case MONSTER_ATTACK:
+			monsterAttack();
+			break;
+
+		case PLAYER_ATTACK:
+			playerAttack();
+			break;
+
+		case NEW_TURN:
+			addLine("- Nouveau tour");
+			state=CHECK_INI;
 			break;
 
 		default:
@@ -115,6 +174,8 @@ void onInit(){
 	Helper::seed("Bla");
 
 	win_game=derwin(stdscr, string_buffer_size, COLS, 0, 0);
+	
+	win_help=derwin(stdscr, 2, COLS, string_buffer_size, 0);
 
 	player = new Player(); 
 
@@ -133,12 +194,11 @@ void onKey(int key){
 }
 
 void onUpdate(){
-	//doupdate();
 }
 
 void onExit(){
 	delwin(win_game);
-	//delwin(win_help);
+	delwin(win_help);
 
 	delete(player);
 	delete(monster);
