@@ -32,6 +32,7 @@ unsigned int Entity::getDamage(){
 
 bool Entity::removeLife(unsigned int i){
 	if(i>=pv){
+		pv=0;
 		return true;
 	}
 	pv-=i;

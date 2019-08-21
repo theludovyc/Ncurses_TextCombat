@@ -18,7 +18,9 @@ enum states{
 	PLAYER_ATTACK,
 	NEW_TURN,
 	PLAYER_DEATH,
-	MONSTER_DEATH
+	MONSTER_DEATH,
+	TREASURE_0,
+	TREASURE_1
 };
 
 using namespace std;
@@ -211,6 +213,16 @@ void todo(){
 		case NEW_TURN:
 			addLine("- Nouveau tour");
 			state=CHECK_INI;
+			break;
+
+		case MONSTER_DEATH:
+			addLine(monster->getName() + " est mort.");
+			state=TREASURE_0;
+			break;
+
+		case TREASURE_0:
+			addLine(player->getName() + " a trouvé un trésor !");
+			state=TREASURE_1;
 			break;
 
 		default:
