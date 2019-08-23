@@ -34,6 +34,8 @@ class Entity{
 		unsigned int getDamage();
 
 		bool removeLife(unsigned int i);
+
+		void addLife(unsigned int i);
 };
 
 #endif

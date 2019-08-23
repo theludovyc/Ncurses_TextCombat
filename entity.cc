@@ -38,3 +38,11 @@ bool Entity::removeLife(unsigned int i){
 	pv-=i;
 	return false;
 }
+
+void Entity::addLife(unsigned int i){
+	if(i>=(pvMax-pv)){
+		pv=pvMax;
+		return;
+	}
+	pv+=i;
+}

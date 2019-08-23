@@ -1,9 +1,9 @@
 #include "game.h"
 #include "entity_player.h"
 #include "entity_monster.h"
+#include "item_potion.h"
 
 #include <array>
-#include <string>
 
 #define string_buffer_size 5
 
@@ -20,7 +20,9 @@ enum states{
 	PLAYER_DEATH,
 	MONSTER_DEATH,
 	TREASURE_0,
-	TREASURE_1
+	TREASURE_1,
+	TREASURE_2,
+	LEAVE_ROOM
 };
 
 using namespace std;
@@ -40,6 +42,10 @@ bool monster_attack;
 bool player_key_isActive=false;
 unsigned char player_key_max;
 unsigned char player_key=0;
+
+Potion* potion;
+
+Item* item;
 
 void printS(string s){
 	printw(s.c_str());
@@ -180,6 +186,11 @@ void playerAttack(){
 	state=NEW_TURN;
 }
 
+void leaveRoom(){
+	addLine(player->getName()+" continue son chemin.");
+	state=OPEN_DOOR;
+}
+
 void todo(){
 	switch(state){
 		case OPEN_DOOR:
@@ -225,6 +236,37 @@ void todo(){
 			state=TREASURE_1;
 			break;
 
+		case TREASURE_1:
+			item=potion;
+
+			addLine("C'est "+item->getName(lvl, *player)+".");
+			help_print("a.Utiliser z.Laisser");
+			player_key_isActive=true;
+			player_key=4;
+			player_key_max=2;
+			state=TREASURE_2;
+			break;
+
+		case TREASURE_2:
+			if(player_key<player_key_max){
+				help_erase();
+				player_key_isActive=false;
+
+				if(player_key==0){
+					addLine(player->getName()+" l'utilise.");
+					item->use(player);
+					state=LEAVE_ROOM;
+				}else{
+					leaveRoom();
+				}
+				break;
+			}
+			goto end;
+
+		case LEAVE_ROOM:
+			leaveRoom();
+			break;
+
 		default:
 			goto end;
 	}
@@ -250,6 +292,8 @@ void onInit(){
 	player = new Player(); 
 
 	monster = new Monster();
+
+	potion = new Potion();
 
 	todo();
 
@@ -296,4 +340,5 @@ void onExit(){
 
 	delete(player);
 	delete(monster);
+	delete(potion);
 }
