@@ -176,6 +176,7 @@ void playerAttack(){
 			addText(" rate son attaque.");
 		}
 	}else{
+		player->setArmorToMax();
 		addText(" prépare sa défense.");
 	}
 

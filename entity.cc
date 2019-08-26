@@ -31,11 +31,29 @@ unsigned int Entity::getDamage(){
 }
 
 bool Entity::removeLife(unsigned int i){
-	if(i>=pv){
+	if(i>(armor+pv) ){
+		pv=0;
+		armor=0;
+		return true;
+	}else if(armor>i){
+		armor-=i;
+		return false;
+	}else if(armor>0){
+		armor=0;
+		i-=armor;
+		if(pv>i){
+			pv-=i;
+			return false;
+		}
+		pv=0;
+		return true;
+	}else if(pv>i){
+		pv-=i;
+		return false;
+	}else{
 		pv=0;
 		return true;
 	}
-	pv-=i;
 	return false;
 }
 
@@ -45,4 +63,8 @@ void Entity::addLife(unsigned int i){
 		return;
 	}
 	pv+=i;
+}
+
+void Entity::setArmorToMax(){
+	armor=armorMax;
 }

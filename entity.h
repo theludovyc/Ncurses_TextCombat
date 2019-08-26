@@ -20,6 +20,9 @@ class Entity{
 		unsigned int degMin;
 		unsigned int degMax;
 
+		unsigned int armor;
+		unsigned int armorMax;
+
 	public:
 		Entity(){};
 
@@ -36,6 +39,8 @@ class Entity{
 		bool removeLife(unsigned int i);
 
 		void addLife(unsigned int i);
+
+		void setArmorToMax();
 };
 
 #endif

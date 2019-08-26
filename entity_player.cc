@@ -4,6 +4,9 @@ Player::Player():Entity("Héro"){
 	pvMax=5;
 	pv=pvMax;
 
+	armorMax=5;
+	armor=armorMax;
+
 	ini=5;
 
 	cc=50;
