@@ -9,7 +9,7 @@ class Potion : public Item{
 	public:
 		Potion(){};
 
-		std::string getName(unsigned int, Player);
+		std::string getName(unsigned int, const Player&);
 
 		void use(Player*);
 };

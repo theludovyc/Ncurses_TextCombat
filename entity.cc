@@ -65,8 +65,8 @@ void Entity::addLife(unsigned int i){
 	pv+=i;
 }
 
-unsigned int Entity::getArmor(){
-	return armor;
+unsigned int Entity::getArmorMax() const{
+	return armorMax;
 }
 
 void Entity::setArmorMax(unsigned int i){

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-string Potion::getName(unsigned int i, Player p){
+string Potion::getName(unsigned int i, const Player& p){
 	life=i;
 
 	return ("une Potion("+to_string(life)+")");

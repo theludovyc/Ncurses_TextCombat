@@ -10,7 +10,7 @@ class Item{
 		std::string name;
 
 	public:
-		virtual std::string getName(unsigned int i, Player p) =0;
+		virtual std::string getName(unsigned int i, const Player&) =0;
 
 		virtual void use(Player*) =0;
 };

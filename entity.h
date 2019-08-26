@@ -40,7 +40,7 @@ class Entity{
 
 		void addLife(unsigned int i);
 
-		unsigned int getArmor();
+		unsigned int getArmorMax() const;
 
 		void setArmorMax(unsigned int);
 
