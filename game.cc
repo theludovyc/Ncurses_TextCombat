@@ -30,7 +30,7 @@ using namespace std;
 Player* player;
 Monster* monster;
 
-unsigned int lvl = 1;
+unsigned int lvl = 0;
 
 array<string, string_buffer_size> string_buffer;
 
@@ -195,6 +195,7 @@ void leaveRoom(){
 void todo(){
 	switch(state){
 		case OPEN_DOOR:
+			lvl++;
 			openDoor();
 			state=MONSTER_POP;
 			break;
