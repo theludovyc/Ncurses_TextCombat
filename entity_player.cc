@@ -11,6 +11,6 @@ Player::Player():Entity("Héro"){
 
 	cc=50;
 
-	degMax=3;
-	degMin=1;
+	damageMax=3;
+	damageMin=1;
 }

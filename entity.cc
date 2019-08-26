@@ -27,7 +27,7 @@ bool Entity::testAttack(){
 }
 
 unsigned int Entity::getDamage(){
-	return Helper::rand_between(degMin, degMax);
+	return Helper::rand_between(damageMin, damageMax);
 }
 
 bool Entity::removeLife(unsigned int i){

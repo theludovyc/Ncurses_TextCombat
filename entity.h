@@ -17,8 +17,8 @@ class Entity{
 		unsigned int cc;
 
 		//degat
-		unsigned int degMin;
-		unsigned int degMax;
+		unsigned int damageMin;
+		unsigned int damageMax;
 
 		unsigned int armor;
 		unsigned int armorMax;
