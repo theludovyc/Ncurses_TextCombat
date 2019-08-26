@@ -2,10 +2,6 @@
 
 using namespace std;
 
-Potion::Potion(){
-	genre=true;
-}
-
 string Potion::getName(unsigned int i, Player p){
 	life=i;
 

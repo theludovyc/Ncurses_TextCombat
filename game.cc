@@ -2,6 +2,7 @@
 #include "entity_player.h"
 #include "entity_monster.h"
 #include "item_potion.h"
+#include "item_armor.h"
 
 #include <array>
 
@@ -43,7 +44,7 @@ bool player_key_isActive=false;
 unsigned char player_key_max;
 unsigned char player_key=0;
 
-Potion* potion;
+array<Item*, 2> items;
 
 Item* item;
 
@@ -239,7 +240,7 @@ void todo(){
 			break;
 
 		case TREASURE_1:
-			item=potion;
+			item=items[Helper::rand_between(0, items.size()-1)];
 
 			addLine("C'est "+item->getName(lvl, *player)+".");
 			help_print("a.Utiliser z.Laisser");
@@ -295,7 +296,9 @@ void onInit(){
 
 	monster = new Monster();
 
-	potion = new Potion();
+	items[0] = new Potion();
+
+	items[1] = new Armor();
 
 	todo();
 
@@ -342,5 +345,8 @@ void onExit(){
 
 	delete(player);
 	delete(monster);
-	delete(potion);
+
+	for(int i=0; i<items.size(); i++){
+		delete(items[i]);
+	}
 }

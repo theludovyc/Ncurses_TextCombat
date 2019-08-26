@@ -9,8 +9,6 @@ class Item{
 	protected:
 		std::string name;
 
-		bool genre;
-
 	public:
 		virtual std::string getName(unsigned int i, Player p) =0;
 

@@ -1,13 +1,13 @@
-#ifndef _h_potion
-#define _h_potion
+#ifndef _h_armor
+#define _h_armor
 
 #include "item.h"
 
-class Potion : public Item{
-	unsigned int life;
+class Armor : public Item{
+	unsigned int armor;
 
 	public:
-		Potion(){};
+		Armor(){};
 
 		std::string getName(unsigned int, Player);
 
