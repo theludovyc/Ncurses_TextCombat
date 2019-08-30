@@ -108,7 +108,7 @@ void openDoor(){
 void monsterPop(){
 	monster->init(lvl);
 
-	addLine("Un "+monster->getName()+" apparait...");
+	queue_addLine("Un "+monster->getName()+" apparait...");
 }
 
 void help_print(string s){
@@ -145,7 +145,7 @@ bool checkIni(){
 	return b;
 }
 
-void monsterAttack(){
+bool monsterAttack(){
 	monster_attack=true;
 
 	queue_addLine(monster->getName());
@@ -162,15 +162,17 @@ void monsterAttack(){
 
 			if(player->removeLife(dam)){
 				state=PLAYER_DEATH;
-				return;
+				return true;
 			}
 		}
 	}else{
 		queue_addText(" rate son attaque.");
 	}
+
+	return false;
 }
 
-void playerAttack(){
+bool playerAttack(){
 	player_attack=true;
 
 	queue_addLine(player->getName());
@@ -187,7 +189,7 @@ void playerAttack(){
 
 			if(monster->removeLife(dam)){
 				state=MONSTER_DEATH;
-				return;
+				return true;
 			}
 		}else{
 			queue_addText(" rate son attaque.");
@@ -196,6 +198,8 @@ void playerAttack(){
 		player->setArmorToMax();
 		queue_addText(" prépare sa défense.");
 	}
+
+	return false;
 }
 
 void leaveRoom(){
@@ -296,9 +300,11 @@ void todo_newTurn(){
 	player_attack=false;
 	monster_attack=false;
 
-	if(!checkIni()){
-		monsterAttack();
-		return;
+	if(!checkIni() ){
+		if(!monsterAttack()){
+			state=PLAYER_ATTACK;
+			return;
+		}
 	}
 
 	state=PLAYER_ATTACK;
@@ -307,25 +313,39 @@ void todo_newTurn(){
 void todo1(){
 	switch(state){
 		case START:
+			lvl++;
+
 			queue_addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
+
+			monsterPop();
+
 			todo_newTurn();
 			break;
 		
 		case PLAYER_ATTACK:
 			help_erase();
 
-			playerAttack();
+			if(playerAttack() ){
+				state=MONSTER_DEATH;
+			}else{
+				if(!monster_attack && !monsterAttack()){
+					queue_addLine("- Nouveau tour");
+					todo_newTurn();
+				}
+			}
 
 			queue_pop();
 
 			refreshBuffer();
+			
+			break;
 
-			if(!monster_attack){
-				monsterAttack();
-			}
+		case MONSTER_DEATH:
+			queue_addLine("MONSTER DEATH");
+			break;
 
-			queue_addLine("- Nouveau tour");
-			todo_newTurn();
+		case PLAYER_DEATH:
+			queue_addLine("PLAYER DEATH");
 			break;
 	}
 }
