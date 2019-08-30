@@ -4,6 +4,7 @@
 #include "item_potion.h"
 #include "item_armor.h"
 
+#include <queue>
 #include <array>
 
 #define string_buffer_size 5
@@ -23,19 +24,21 @@ enum states{
 	TREASURE_0,
 	TREASURE_1,
 	TREASURE_2,
-	LEAVE_ROOM
+	LEAVE_ROOM,
+	START
 };
 
 using namespace std;
+
+queue<string> string_queue;
+array<string, string_buffer_size> string_buffer;
 
 Player* player;
 Monster* monster;
 
 unsigned int lvl = 0;
 
-array<string, string_buffer_size> string_buffer;
-
-unsigned int state = OPEN_DOOR;
+unsigned int state = START;
 
 bool player_attack;
 bool monster_attack;
@@ -62,8 +65,21 @@ void addLine(string s){
 	string_buffer[i]=s;
 }
 
+void queue_addLine(string s){
+	string_queue.push(s);
+}
+
 void addText(string s){
 	string_buffer.back() += s;
+}
+
+void queue_addText(string s){
+	string_queue.back() += s;
+}
+
+void queue_pop(){
+	addLine(string_queue.front());
+	string_queue.pop();
 }
 
 void printLine(string s){
@@ -102,41 +118,40 @@ void help_erase(){
 
 void playerSetAttack(){
 	help_print("a.Atk z.Atk++ e.Def");
-	player_key_isActive=true;
 	player_key=4;
 	player_key_max=3;
 	state=PLAYER_ATTACK;
 }
 
-void checkIni(){
-	player_attack=false;
-	monster_attack=false;
+bool checkIni(){
+	bool b=false;
 
 	if (player->getIni() > monster->getIni() ){
-		addLine(player->getName());
-		playerSetAttack();
+		queue_addLine(player->getName());
+		b=true;
 	}else{
-		addLine(monster->getName());
-		state=MONSTER_ATTACK;
+		queue_addLine(monster->getName());
 	}
 
-	addText(" attaque en premier !");
+	queue_addText(" attaque en premier !");
+
+	return b;
 }
 
 void monsterAttack(){
 	monster_attack=true;
 
-	addLine(monster->getName());
+	queue_addLine(monster->getName());
 
 	if(monster->testAttack()){
-		addText(" attaque, ");
+		queue_addText(" attaque, ");
 
 		if(player->testAttack()){
-			addText("mais " + player->getName() + " se défend !");
+			queue_addText("mais " + player->getName() + " se défend !");
 		}else{
 			auto dam = monster->getDamage();
 
-			addText("et inflige " + to_string(dam) + " dégat(s)");
+			queue_addText("et inflige " + to_string(dam) + " dégat(s)");
 
 			if(player->removeLife(dam)){
 				state=PLAYER_DEATH;
@@ -144,14 +159,8 @@ void monsterAttack(){
 			}
 		}
 	}else{
-		addText(" rate son attaque.");
+		queue_addText(" rate son attaque.");
 	}
-
-	if(!player_attack){
-		playerSetAttack();
-		return;
-	}
-	state=NEW_TURN;
 }
 
 void playerAttack(){
@@ -285,6 +294,39 @@ void todo(){
 	return;
 }
 
+void todo1(){
+	switch(state){
+		case START:
+			player_attack=false;
+			monster_attack=false;
+
+			queue_addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
+
+			if(!checkIni()){
+				monsterAttack();
+				return;
+			}
+
+			player_key_isActive=true;
+			state=PLAYER_ATTACK;
+			break;
+		
+		case PLAYER_ATTACK:
+			break;
+
+		case MONSTER_ATTACK:
+			break;
+	}
+}
+
+void help_todo(){
+	switch(state){
+		case PLAYER_ATTACK:
+			playerSetAttack();
+			break;
+	}
+}
+
 void onInit(){
 	Helper::seed("Bla");
 
@@ -300,13 +342,20 @@ void onInit(){
 
 	items[1] = new Armor();
 
-	todo();
+	todo1();
+
+	queue_pop();
+
+	printBuffer();
+
+	touchwin(win_game);
+	wrefresh(win_game);
 
 	wcursyncup(win_game);
 }
 
 void onKey(int key){
-	if(player_key_isActive){
+	/*if(player_key_isActive){
 		switch(key){
 			case 'a':
 				player_key=0;
@@ -333,6 +382,46 @@ void onKey(int key){
 		}
 	}else if(key == ' '){
 		todo();
+	}*/
+
+	if(!string_queue.empty()){
+		if(key==' '){
+			queue_pop();
+
+			if(string_queue.empty()){
+				help_todo();
+			}
+
+			printBuffer();
+
+			touchwin(win_game);
+			wrefresh(win_game);			
+		}
+	}else{
+		switch(key){
+			case 'a':
+				player_key=0;
+				todo1();
+				break;
+			
+			case 'z':
+				player_key=1;
+				todo1();
+				break;
+
+			case 'e':
+				player_key=2;
+				todo1();
+				break;
+
+			case 'r':
+				player_key=3;
+				todo1();
+				break;
+
+			default:
+				break;
+		}
 	}
 }
 
