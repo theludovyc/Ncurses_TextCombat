@@ -193,86 +193,6 @@ bool playerAttack(){
 	return false;
 }
 
-void leaveRoom(){
-	
-}
-
-void todo(){
-	switch(state){
-		case OPEN_DOOR:
-			lvl++;
-			openDoor();
-			state=MONSTER_POP;
-			break;
-
-		case MONSTER_POP:
-			monsterPop();
-			state=CHECK_INI;
-			break;
-
-		case CHECK_INI:
-			checkIni();
-			break;
-
-		case MONSTER_ATTACK:
-			monsterAttack();
-			break;
-
-		case PLAYER_ATTACK:
-			if(player_key<player_key_max){
-				help_erase();
-				player_key_isActive=false;
-				playerAttack();
-				break;
-			}
-			goto end;
-			break;
-
-		case NEW_TURN:
-			addLine("- Nouveau tour");
-			state=CHECK_INI;
-			break;
-
-		case MONSTER_DEATH:
-			addLine(monster->getName() + " est mort.");
-			state=TREASURE_0;
-			break;
-
-		case TREASURE_0:
-			
-			state=TREASURE_1;
-			break;
-
-		case TREASURE_1:
-			
-
-			
-			player_key_isActive=true;
-			player_key=4;
-			player_key_max=2;
-			state=TREASURE_2;
-			break;
-
-		case TREASURE_2:
-			
-			goto end;
-
-		case LEAVE_ROOM:
-			leaveRoom();
-			break;
-
-		default:
-			goto end;
-	}
-
-	//werase(win_game);
-
-	refreshBuffer();
-
-	end:
-	return;
-}
-
 void todo_newTurn(){
 	player_attack=false;
 	monster_attack=false;
@@ -287,18 +207,18 @@ void todo_newTurn(){
 	state=PLAYER_ATTACK;
 }
 
+void todo_start(){
+	lvl++;
+
+	queue_addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
+
+	monsterPop();
+
+	todo_newTurn();
+}
+
 void todo1(){
 	switch(state){
-		case START:
-			lvl++;
-
-			queue_addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
-
-			monsterPop();
-
-			todo_newTurn();
-			break;
-		
 		case PLAYER_ATTACK:
 			help_erase();
 
@@ -338,11 +258,11 @@ void todo1(){
 
 				queue_addLine(player->getName()+" continue son chemin.");
 
+				todo_start();
+
 				queue_pop();
 
 				refreshBuffer();
-
-				state=OPEN_DOOR;
 				break;
 			}
 			break;
@@ -383,7 +303,7 @@ void onInit(){
 
 	items[1] = new Armor();
 
-	todo1();
+	todo_start();
 
 	queue_pop();
 
@@ -393,35 +313,6 @@ void onInit(){
 }
 
 void onKey(int key){
-	/*if(player_key_isActive){
-		switch(key){
-			case 'a':
-				player_key=0;
-				todo();
-				break;
-			
-			case 'z':
-				player_key=1;
-				todo();
-				break;
-
-			case 'e':
-				player_key=2;
-				todo();
-				break;
-
-			case 'r':
-				player_key=3;
-				todo();
-				break;
-
-			default:
-				break;
-		}
-	}else if(key == ' '){
-		todo();
-	}*/
-
 	if(!string_queue.empty()){
 		if(key==' '){
 			queue_pop();
