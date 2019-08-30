@@ -94,6 +94,13 @@ void printBuffer(){
 	}
 }
 
+void refreshBuffer(){
+	printBuffer();
+
+	touchwin(win_game);
+	wrefresh(win_game);
+}
+
 void openDoor(){
 	addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
 }
@@ -166,7 +173,7 @@ void monsterAttack(){
 void playerAttack(){
 	player_attack=true;
 
-	addLine(player->getName());
+	queue_addLine(player->getName());
 
 	if(player_key!=2){
 		if(player->testAttack()){
@@ -176,25 +183,19 @@ void playerAttack(){
 				dam*=2;
 			}
 
-			addText(" inflige " + to_string(dam) + " dégat(s)");
+			queue_addText(" inflige " + to_string(dam) + " dégat(s)");
 
 			if(monster->removeLife(dam)){
 				state=MONSTER_DEATH;
 				return;
 			}
 		}else{
-			addText(" rate son attaque.");
+			queue_addText(" rate son attaque.");
 		}
 	}else{
 		player->setArmorToMax();
-		addText(" prépare sa défense.");
+		queue_addText(" prépare sa défense.");
 	}
-
-	if(!monster_attack){
-		state=MONSTER_ATTACK;
-		return;
-	}
-	state=NEW_TURN;
 }
 
 void leaveRoom(){
@@ -285,36 +286,46 @@ void todo(){
 
 	//werase(win_game);
 
-	printBuffer();
-
-	touchwin(win_game);
-	wrefresh(win_game);
+	refreshBuffer();
 
 	end:
 	return;
 }
 
+void todo_newTurn(){
+	player_attack=false;
+	monster_attack=false;
+
+	if(!checkIni()){
+		monsterAttack();
+		return;
+	}
+
+	state=PLAYER_ATTACK;
+}
+
 void todo1(){
 	switch(state){
 		case START:
-			player_attack=false;
-			monster_attack=false;
-
 			queue_addLine("--- "+player->getName()+" ouvre une porte("+to_string(lvl)+").");
-
-			if(!checkIni()){
-				monsterAttack();
-				return;
-			}
-
-			player_key_isActive=true;
-			state=PLAYER_ATTACK;
+			todo_newTurn();
 			break;
 		
 		case PLAYER_ATTACK:
-			break;
+			help_erase();
 
-		case MONSTER_ATTACK:
+			playerAttack();
+
+			queue_pop();
+
+			refreshBuffer();
+
+			if(!monster_attack){
+				monsterAttack();
+			}
+
+			queue_addLine("- Nouveau tour");
+			todo_newTurn();
 			break;
 	}
 }
@@ -346,10 +357,7 @@ void onInit(){
 
 	queue_pop();
 
-	printBuffer();
-
-	touchwin(win_game);
-	wrefresh(win_game);
+	refreshBuffer();
 
 	wcursyncup(win_game);
 }
@@ -392,10 +400,7 @@ void onKey(int key){
 				help_todo();
 			}
 
-			printBuffer();
-
-			touchwin(win_game);
-			wrefresh(win_game);			
+			refreshBuffer();		
 		}
 	}else{
 		switch(key){
