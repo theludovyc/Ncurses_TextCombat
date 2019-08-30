@@ -123,13 +123,6 @@ void help_erase(){
 	wrefresh(win_help);
 }
 
-void playerSetAttack(){
-	help_print("a.Atk z.Atk++ e.Def");
-	player_key=4;
-	player_key_max=3;
-	state=PLAYER_ATTACK;
-}
-
 bool checkIni(){
 	bool b=false;
 
@@ -161,7 +154,6 @@ bool monsterAttack(){
 			queue_addText("et inflige " + to_string(dam) + " dégat(s)");
 
 			if(player->removeLife(dam)){
-				state=PLAYER_DEATH;
 				return true;
 			}
 		}
@@ -188,7 +180,6 @@ bool playerAttack(){
 			queue_addText(" inflige " + to_string(dam) + " dégat(s)");
 
 			if(monster->removeLife(dam)){
-				state=MONSTER_DEATH;
 				return true;
 			}
 		}else{
@@ -203,8 +194,7 @@ bool playerAttack(){
 }
 
 void leaveRoom(){
-	addLine(player->getName()+" continue son chemin.");
-	state=OPEN_DOOR;
+	
 }
 
 void todo(){
@@ -249,15 +239,14 @@ void todo(){
 			break;
 
 		case TREASURE_0:
-			addLine(player->getName() + " a trouvé un trésor !");
+			
 			state=TREASURE_1;
 			break;
 
 		case TREASURE_1:
-			item=items[Helper::rand_between(0, items.size()-1)];
+			
 
-			addLine("C'est "+item->getName(lvl, *player)+".");
-			help_print("a.Utiliser z.Laisser");
+			
 			player_key_isActive=true;
 			player_key=4;
 			player_key_max=2;
@@ -265,19 +254,7 @@ void todo(){
 			break;
 
 		case TREASURE_2:
-			if(player_key<player_key_max){
-				help_erase();
-				player_key_isActive=false;
-
-				if(player_key==0){
-					addLine(player->getName()+" l'utilise.");
-					item->use(player);
-					state=LEAVE_ROOM;
-				}else{
-					leaveRoom();
-				}
-				break;
-			}
+			
 			goto end;
 
 		case LEAVE_ROOM:
@@ -301,8 +278,8 @@ void todo_newTurn(){
 	monster_attack=false;
 
 	if(!checkIni() ){
-		if(!monsterAttack()){
-			state=PLAYER_ATTACK;
+		if(monsterAttack()){
+			queue_addLine("PLAYER DEATH");
 			return;
 		}
 	}
@@ -326,11 +303,21 @@ void todo1(){
 			help_erase();
 
 			if(playerAttack() ){
-				state=MONSTER_DEATH;
+				//MONSTER_DEATH
+				queue_addLine(monster->getName() + " est mort.");
+				queue_addLine(player->getName() + " a trouvé un trésor !");
+
+				item=items[Helper::rand_between(0, items.size()-1)];
+
+				queue_addLine("C'est "+item->getName(lvl, *player)+".");
+
+				state=TREASURE_0;
 			}else{
-				if(!monster_attack && !monsterAttack()){
+				if(monster_attack || !monsterAttack()){
 					queue_addLine("- Nouveau tour");
 					todo_newTurn();
+				}else{
+					queue_addLine("PLAYER DEATH");
 				}
 			}
 
@@ -340,12 +327,27 @@ void todo1(){
 			
 			break;
 
-		case MONSTER_DEATH:
-			queue_addLine("MONSTER DEATH");
+		case TREASURE_0:
+			if(player_key<player_key_max){
+				help_erase();
+
+				if(player_key==0){
+					queue_addLine(player->getName()+" l'utilise.");
+					item->use(player);
+				}
+
+				queue_addLine(player->getName()+" continue son chemin.");
+
+				queue_pop();
+
+				refreshBuffer();
+
+				state=OPEN_DOOR;
+				break;
+			}
 			break;
 
 		case PLAYER_DEATH:
-			queue_addLine("PLAYER DEATH");
 			break;
 	}
 }
@@ -353,7 +355,15 @@ void todo1(){
 void help_todo(){
 	switch(state){
 		case PLAYER_ATTACK:
-			playerSetAttack();
+			help_print("a.Atk z.Atk++ e.Def");
+			player_key=4;
+			player_key_max=3;
+			break;
+
+		case TREASURE_0:
+			help_print("a.Utiliser z.Laisser");
+			player_key=4;
+			player_key_max=2;
 			break;
 	}
 }
